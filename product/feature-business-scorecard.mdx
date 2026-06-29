@@ -1,0 +1,40 @@
+---
+title: "Business Scorecard"
+description: "How the Business Scorecard works, where it lives in the funnel, and its current state."
+---
+
+## Overview
+
+The Business Scorecard scores a business's brand and online/social presence and presents the result to a prospect. It's the engine behind the **DIY → DFY upsell funnel**: the goal of the project is to test our ability to upsell DIY prospects into a Done-For-You (DFY) sales meeting.
+
+There are two flavors:
+
+- **Public** — shown to prospects (e.g. from a popup or landing page).
+- **Private** — the internal/authenticated version.
+
+## Where it fits in the funnel
+
+A prospect (primarily DIY paid-search traffic) completes the scorecard, which both delivers value (their score) and qualifies them. One proposed flow holds the score back and routes the prospect to an SDR conversation — e.g. "Thank you, our team will be in contact to talk about your scorecard," or a Calendly embed to book a 15-minute call — which also buys time to assemble accurate sources before the score is shown. The final UX decision is still in flight.
+
+Popup / landing-page placement was scoped to **DIY paid traffic** (e.g. `Blaze.ai/home`), explicitly *not* DFY pages, to avoid disturbing the working DFY funnel.
+
+## How it works / data sources
+
+The score is generated from a business's public footprint, including its **Google Business Profile (GBP)** plus social platforms. A planned step shows and confirms the socials being used (including GBP) **before** results, and lets the user add/edit socials and regenerate the score.
+
+> Fallback sources matter: businesses **without a GBP** currently produce weaker results, so a manual social-platform entry flow is needed to make non-GBP businesses viable.
+
+## Current state
+
+- PR 97 is up with the scorecard (latest as of this writing).
+- Prototypes / live locations seen during development:
+  - `dfy.blaze.ai/scorecard`
+  - `qa.blaze.ai/prototypes/pr/<n>/scorecard`
+  - `app.blaze.ai`
+
+## Known issues & roadmap
+
+- **Non-GBP fallback sources** — improve recommendations for businesses without a Google Business Profile via manual social entry. (Viability blocker.)
+- **Confirm/edit-socials-before-results step** — show the socials in use, allow add/edit + regenerate, on both public and private versions.
+- **PDF export** — export the scorecard as a PDF (requested by a client).
+- **Popup placement** — finalize where the public scorecard popup appears in the DIY paid-traffic funnel.
