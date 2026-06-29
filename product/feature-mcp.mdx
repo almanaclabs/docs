@@ -1,0 +1,80 @@
+---
+title: "Blaze MCP"
+description: "The Blaze MCP connector that links Claude (including Claude Design) to Blaze workspaces for exporting, migrating, and scheduling content."
+---
+
+## Overview
+
+The **Blaze MCP** is a Model Context Protocol connector that links Claude — including **Claude Design** for creative — to **Blaze workspaces**. It lets a user move content out of Claude and into Blaze: export and migrate generated creative, then schedule it onto a Blaze content calendar, without leaving the Claude side. The framing from the team is broad: *"We can build anything for your workflow to Blaze via MCP."*
+
+It started as an idea for **enterprise ops and advanced users** and is being worked toward a state safe enough to enable for **DIY** users.
+
+## Why we're building it
+
+The connector is the export/automation bridge between where content is generated (Claude / Claude Design) and where it's scheduled and published (Blaze). It came up repeatedly as a clear pull:
+
+- Originally floated as *"a Blaze MCP could be valuable for enterprise ops and advanced users."* ([Joel Watkins](https://almanac-hq.slack.com/archives/C084S7K1BE1/p1773838093441049))
+- Picked up in launch planning as net-new work under the "OQ" track alongside agentic documentation. ([Adam Nathan](https://almanac-hq.slack.com/archives/C039BN28J6R/p1775848429791469))
+- Repeatedly pushed as a priority — *"people want MCP"* and a case for building it sooner rather than later. ([Adam Nathan](https://almanac-hq.slack.com/archives/CJMSRRV5L/p1778187415561679))
+- A PRD was drafted for it. ([gordon](https://almanac-hq.slack.com/archives/C039BN28J6R/p1776708438972269))
+
+## What it does / asks
+
+The capabilities requested across product and DFY threads:
+
+- **Export & migrate content** from Claude/Claude Design into a Blaze workspace, including scheduling it across the content calendar.
+- **Brand kit via MCP** — create/populate a brand kit through the connector. (Shipped — see Current state.)
+- **Scheduling** — schedule the migrated content onto Blaze's calendar. (In review — see Current state.)
+- **Get content and copy, edit captions, edit text overlays** so Claude can make revisions on content. This was the DFY ask: prioritize read + edit of captions/text overlays so Claude can revise 30 days of content. ([DFY action plan](https://almanac-hq.slack.com/archives/C039BN28J6R/p1780424456509389))
+- **Replace Brand Voice with a Claude Context File via MCP** — surfaced as a distinct product ask. ([Adam Nathan](https://almanac-hq.slack.com/archives/C039BN28J6R/p1780429572814999))
+
+## Current state
+
+- **Brand kit ask — shipped.** Joel's brand-kit ask for MCP is done.
+- **Scheduling — in review.** The scheduling piece (for Joel/Fatima) was put up for review.
+- **Safety guards for DIY — in progress.** Boundaries/safety guards are being added so the connector can be enabled for DIY users.
+
+Source: [Dakota's status](https://almanac-hq.slack.com/archives/C0B9V6BFSAH/p1781711430799279).
+
+As of the latest rollout discussion, **Fatima is the only person to have tested the connector end to end.** ([rollout thread](https://almanac-hq.slack.com/archives/C0AH52BRMQW/p1782501619775749))
+
+## Testing feedback
+
+From the first end-to-end test of the MCP migration ([Fatima](https://almanac-hq.slack.com/archives/C0AH52BRMQW/p1782501768965169)):
+
+1. **Dates collapse onto one day.** Content migrated successfully but all of it landed on a single date instead of distributing across the calendar. Date and time live in the metadata section of "Studio" — open question whether that metadata needs a different format for dates to map correctly.
+2. **File-type recognition.** Some content was animations that should import into Blaze as **MP4s**, but they came in as **PNGs**. The MCP needs to detect the right file format and import accordingly.
+3. **Workspace detection is unreliable.** The first migration picked up the correct workspace (Devplan), but switching to a second project struggled to locate the target workspace (Karina Aybar).
+
+## Next steps
+
+From the rollout thread ([joe](https://almanac-hq.slack.com/archives/C0AH52BRMQW/p1782501619775749)):
+
+1. **Improve workspace-detection reliability** — reliably find the right Blaze workspace to export and schedule content from Claude.
+2. **Write a playbook** — a quick guide bridging the gap between Claude Design and the non-Design Claude ⇄ Blaze MCP connector, so the whole team can use it productively.
+
+## Open questions & known gaps
+
+- **Studio date/time metadata format** — what format is needed so migrated content distributes across the calendar instead of collapsing to one date?
+- **File-format detection** — how should the MCP decide MP4 vs PNG on import?
+- **Webhook on push** — pushing from the MCP may not run the webhook that pushes to our DB, so DB state can end up out of sync with what the MCP wrote. Needs confirmation/fix. ([Tristan Marchand](https://almanac-hq.slack.com/archives/C099JH0JPQA/p1777998678810079))
+
+## Rollout
+
+- **Audience:** started for enterprise ops / advanced users; goal is to enable for DIY once safety guards are in place.
+- **Testing:** Fatima has done the only end-to-end test so far; broaden testing before wider enablement.
+
+## People
+
+- **Dakota** — eng owner/builder (shipped brand kit, scheduling in review, building DIY safety guards; owner of the get-content/edit-captions MCP ask).
+- **Joel Watkins** — original proposer; brand-kit ask.
+- **joe** — coordinating rollout and the team playbook.
+- **Fatima** — first tester; source of current feedback.
+- **skyler, Petar** — cc'd on rollout.
+- **Adam Nathan** — exec push/prioritization.
+- **gordon** — PRD.
+- **Kevin Aleman, kyle, Eddie Wu** — brand-voice-as-Claude-context-file ask.
+
+## Sources
+
+This spec is synthesized from Slack discussion across the product, DFY, rollout, and #feat-mcp channels. Key threads are linked inline above.
