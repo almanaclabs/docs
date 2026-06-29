@@ -1,0 +1,75 @@
+---
+title: "Feature Channels → Living Docs"
+description: "How every feature's spec stays the source of truth: a Slack channel per feature, an associated Mintlify doc, and Claude opening PRs to keep the doc in sync with what the team decides."
+---
+
+## Why this exists
+
+Decisions get made in Slack and never make it back into the docs. The spec drifts from reality, onboarding suffers, and "what did we decide?" becomes archaeology. This workflow keeps the **doc as the source of truth** by giving every feature a dedicated channel and a living spec, and having Claude reconcile the two: when the conversation changes a decision, Claude opens a pull request that updates the spec.
+
+<Note>
+This is a proposed process. A few defaults below are marked **(to confirm)** — they reflect sensible starting points, not final calls.
+</Note>
+
+## The shape of it
+
+<Steps>
+  <Step title="Spin up a feature channel">
+    Create a Slack channel per feature, named `#feat-<name>` **(to confirm)**. Invite Claude to it. The channel is where the feature is discussed, decided, and refined.
+  </Step>
+  <Step title="Pair it with a spec">
+    Each channel maps to exactly one spec page in the [`almanaclabs/docs`](https://github.com/almanaclabs/docs) repo at `product/<feature>.mdx` **(to confirm)**. Bookmark the spec (and its open PR) in the channel so the link to the source of truth is always one click away. If the spec doesn't exist yet, Claude seeds a stub on request.
+  </Step>
+  <Step title="Discuss in the channel">
+    The team talks through the feature normally. Claude is present and following along, but stays quiet unless there's something worth capturing or it's asked.
+  </Step>
+  <Step title="Claude reconciles the doc">
+    When a decision changes the spec, Claude opens a **draft PR** against `almanaclabs/docs` that edits the relevant page to match what was decided. The PR description links back to the Slack thread that drove the change, so every doc edit is traceable to its conversation.
+  </Step>
+  <Step title="A human reviews and merges">
+    Claude never self-merges. A person reviews the PR, requests changes in-thread or on the PR, and merges. On merge, Mintlify auto-deploys the updated spec.
+  </Step>
+</Steps>
+
+## When Claude acts
+
+Claude defaults to **signal-based** updates — it opens a PR when explicitly prompted, not on every message **(to confirm)**:
+
+- **@mention Claude** in the channel with what changed, or
+- React to the deciding message with :memo:.
+
+A channel can opt into **proactive mode**, where Claude watches for decisions that contradict the current spec and opens a PR on its own. Proactive mode is more complete but noisier; signal-based is predictable. Either way, the output is the same: a draft PR a human reviews.
+
+## PR conventions
+
+- **One PR per discrete change** **(to confirm)**, kept in draft until a human is ready to review.
+- Every PR description links the Slack thread that prompted it.
+- Claude keeps an eye on its own PRs and surfaces CI failures or review comments back in the channel.
+- The doc, once merged, is the source of truth — if Slack and the doc disagree, the doc wins (and a PR should fix whichever is wrong).
+
+## What's needed to turn this on
+
+<CardGroup cols={2}>
+  <Card title="Auto-respond in feature channels" icon="ear-listen">
+    Claude has to be listening in each feature channel for the proactive/signal flow to work.
+  </Card>
+  <Card title="Docs repo access" icon="github">
+    Claude needs write access to `almanaclabs/docs` to open PRs (already set up).
+  </Card>
+  <Card title="A naming + mapping convention" icon="signs-post">
+    A predictable channel name and spec path so the channel↔doc mapping is unambiguous.
+  </Card>
+  <Card title="A review owner" icon="user-check">
+    Someone who reviews and merges doc PRs so they don't pile up.
+  </Card>
+</CardGroup>
+
+## Open questions
+
+These are the calls still to make before rolling this out widely:
+
+1. **Spec location** — `product/<feature>.mdx` in this repo, a dedicated `specs/` folder, or a separate repo?
+2. **Channel scope signal** — naming convention (`#feat-*`), a bookmark, a channel topic marker, or some combination?
+3. **Trigger sensitivity** — signal-based by default, or proactive?
+4. **PR shape** — one PR per change, or one rolling PR per feature until merge?
+5. **Review ownership** — anyone in the channel, or a designated doc owner per feature?

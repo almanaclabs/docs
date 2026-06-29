@@ -44,7 +44,8 @@
         "group": "Product",
         "icon": "box",
         "pages": [
-          "product/overview"
+          "product/overview",
+          "product/feature-channel-workflow"
         ]
       }
     ]
