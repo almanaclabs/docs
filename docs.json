@@ -31,7 +31,23 @@
           "icon": "newspaper"
         }
       ]
-    }
+    },
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "index",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Product",
+        "icon": "box",
+        "pages": [
+          "product/overview"
+        ]
+      }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
