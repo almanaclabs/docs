@@ -29,7 +29,8 @@
         "icon": "box",
         "pages": [
           "product/overview",
-          "product/feature-channel-workflow"
+          "product/feature-channel-workflow",
+          "product/feature-business-scorecard"
         ]
       }
     ]
