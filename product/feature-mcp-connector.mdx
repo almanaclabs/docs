@@ -1,0 +1,45 @@
+---
+title: "Blaze MCP Connector"
+description: "How the Blaze MCP connector links Claude and Claude Design to Blaze workspaces, what it can do, and its current state."
+---
+
+## Overview
+
+The Blaze MCP connector is an export and editing link between Claude (including Claude Design for creative) and Blaze workspaces. Through it, Claude can read and act on content in a Blaze workspace, so users can move creative out of Claude Design and into Blaze, then get, edit, and schedule that content without leaving the Claude conversation.
+
+The strategic framing from the team: "we can build anything for your workflow to Blaze via MCP." The near-term goal is to make this reliable enough for the whole team to use day to day, and eventually to enable it for DIY users behind appropriate safety guards.
+
+## What it does
+
+Capabilities that are shipped or prioritized:
+
+- **Export creative from Claude Design into Blaze** — bring assets and content produced in Claude Design into a Blaze workspace.
+- **Get content and copy** — pull existing content and copy from a Blaze workspace into the conversation.
+- **Edit captions and text overlays** — make revisions to captions and on-asset text overlays so Claude can iterate on content. (Top DFY priority — reviewing text overlays and captions across 30 days of content is a key delivery bottleneck.)
+- **Schedule content** — schedule content into the Blaze calendar. (Built for the joel/fatima use case; went up for review.)
+- **Brand kit** — joel's brand kit ask shipped via MCP.
+
+Related, adjacent work:
+
+- **Brand voice via a Claude Context File** — a proposal to replace the existing Brand Voice setting with a Claude Context File delivered through MCP.
+
+## Where it fits
+
+The connector targets the DFY content-delivery workflow first, where the primary pain point is getting clients their next 30 days of content after week-one content is approved. Letting Claude get content, edit captions, and edit text overlays directly in Blaze removes the manual review-and-edit bottleneck. The longer-term path is enabling the connector for DIY users once boundaries and safety guards are in place.
+
+## Testing feedback / known issues
+
+From early hands-on testing of the migration flow:
+
+- **Content lands on a single date** — migrated content all landed on one date instead of distributing across the calendar. The date and time live in the metadata section of the Studio; the date formatting likely needs to change so dates map correctly across the calendar.
+- **File-type recognition** — content that should import as MP4 (e.g. animations) came in as PNG. The connector needs to detect the correct file format and import accordingly.
+- **Workspace detection** — the first migration located the correct workspace, but switching to a second project struggled to find the right Blaze workspace. Improving the reliability of finding the right workspace to export and schedule from is a top ask.
+
+## Roadmap / open items
+
+- **Reliable workspace selection** — make finding the right Blaze workspace to export and schedule from dependable across projects.
+- **Bridging playbook** — a quick playbook on bridging the gap between Claude Design and the non-Design Claude ↔ Blaze MCP connector.
+- **Correct date distribution** on migration (calendar mapping).
+- **Correct file-type detection** on import (MP4 vs PNG, etc.).
+- **Safety guards for DIY** — boundaries and guardrails so the connector can be enabled for DIY users.
+- **Brand voice via Claude Context File** — evaluate replacing the Brand Voice setting with an MCP-delivered context file.
