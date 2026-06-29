@@ -9,15 +9,6 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
     "global": {
       "anchors": [
         {
@@ -34,17 +25,11 @@
     },
     "groups": [
       {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      },
-      {
         "group": "Product",
         "icon": "box",
         "pages": [
-          "product/overview"
+          "product/overview",
+          "product/feature-channel-workflow"
         ]
       }
     ]
