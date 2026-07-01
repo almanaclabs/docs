@@ -1,0 +1,47 @@
+---
+title: "Video Editor"
+description: "Living spec for the in-editor video feature — generation, captions, splicing, and color. Synced from the #feat-video channel."
+---
+
+This is the living spec for the video-editor feature, tracked in the **#feat-video** Slack channel and paired with this page under the [feature-channel workflow](/product/feature-channel-workflow). The doc is the source of truth: when Slack and this page disagree, this page wins.
+
+## Current state
+
+The channel was created on 2026-07-01 and this is the opening scaffold. The scope below is the initial feature list proposed by Petar and Joel and [shared by Eddie Wu](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989) — nothing is built or sequenced yet. Sections fill in as decisions land.
+
+## Core features (requested)
+
+The editor-basics set the team wants first:
+
+| Feature | What it does |
+| --- | --- |
+| **Generate video in editor** | An entry point to generate a video from inside the editor. |
+| **Captions from script** | Generate captions directly from the script. |
+| **Captions from source** | Generate captions from an uploaded audio or video file. |
+| **Splicing** | Cut and rejoin clips on the timeline. |
+| **Color filters** | Apply color filters to video. |
+| **Auto scene splicing** | Automatically splice scenes on import, driven via MCP. |
+
+## Nice to have
+
+- Speed up / slow down video.
+- Left-to-right timeline with named layers.
+- More shape options.
+- Select multiple layers from the timeline or canvas.
+
+## Open questions
+
+- Priority and sequencing across the core features — not yet decided.
+- What the "generate video" entry point looks like (model, trigger, and UI).
+- How much of scene splicing is automatic (MCP on import) versus manual on the timeline.
+
+## People
+
+- **Petar** and **Joel Watkins** — proposed the feature list.
+- **Eddie Wu** — shared the list in-channel.
+- **Tristan Marchand** — tagged on the requirements.
+- **Dakota** — requested this spec.
+
+## Sources
+
+- [Video editor feature list](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989) — Eddie Wu in #feat-video, 2026-07-01.

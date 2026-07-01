@@ -31,7 +31,8 @@
           "product/overview",
           "product/feature-channel-workflow",
           "product/feature-business-scorecard",
-          "product/feature-mcp"
+          "product/feature-mcp",
+          "product/feature-video"
         ]
       }
     ]
