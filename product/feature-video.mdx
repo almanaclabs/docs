@@ -7,7 +7,19 @@ This is the living spec for the video-editor feature, tracked in the **#feat-vid
 
 ## Current state
 
-The channel was created on 2026-07-01 and this is the opening scaffold. The scope below is the initial feature list proposed by Petar and Joel and [shared by Eddie Wu](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989) — nothing is built or sequenced yet. Sections fill in as decisions land.
+The channel was created on 2026-07-01 and this is the opening scaffold. The scope below is the initial feature list proposed by Petar and Joel and [shared by Eddie Wu](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989). Several editor panels and controls already ship in-app today — see [Available in the editor today](#available-in-the-editor-today) below. The items under **Core features (requested)** remain requested and are not yet built. Sections fill in as decisions land.
+
+## Available in the editor today
+
+Petar surfaced these on 2026-07-02: most already ship in-app, and the ask is more visibility of what already exists rather than net-new work.
+
+| Surface | What it does |
+| --- | --- |
+| **Text panel** | Side panel with category tabs (All / Simple / Title / Lower Third / Other) and style presets: Title, Simple, Cursive, Serif, Typewriter, Bold, Editorial, Modern (Bauhaus), Elegant, Industrial, Reliable. |
+| **Audio panel** | Browse and add audio: AI voice / Upload tabs, Voice Cloning and Voiceover, an Asset Library, and Stock Music with categories (Now Trending, Trending on TikTok, Lifestyle Vlog). |
+| **AI voice (text-to-speech)** | "Add Text-to-Speech" panel: text input, language selector, and Actors / Voice Clone tabs for choosing a voice. |
+| **Audio fade in/out** | Toggle with independent Fade In and Fade Out duration sliders. |
+| **Video speed** | Single speed slider (0–2×); intentionally simple, no speed ramps. |
 
 ## Core features (requested)
 
@@ -24,7 +36,7 @@ The editor-basics set the team wants first:
 
 ## Nice to have
 
-- Speed up / slow down video.
+- Speed up / slow down video. (Available in the editor today — see [Available in the editor today](#available-in-the-editor-today); tracking ticket BLZ-15857 may need a state update.)
 - Left-to-right timeline with named layers.
 - More shape options.
 - Select multiple layers from the timeline or canvas.
@@ -34,6 +46,7 @@ The editor-basics set the team wants first:
 - Priority and sequencing across the core features — not yet decided.
 - What the "generate video" entry point looks like (model, trigger, and UI).
 - How much of scene splicing is automatic (MCP on import) versus manual on the timeline.
+- Whether the requested GIF / animated-PNG element library means a Canva-style browsable library of GIFs / animated stickers, and whether that's feasible — distinct from the existing animated-image pipeline. Pending Petar's clarification.
 
 ## People
 
