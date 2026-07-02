@@ -7,19 +7,20 @@ This is the living spec for the video-editor feature, tracked in the **#feat-vid
 
 ## Current state
 
-The channel was created on 2026-07-01 and this is the opening scaffold. The scope below is the initial feature list proposed by Petar and Joel and [shared by Eddie Wu](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989). Several editor panels and controls already ship in-app today — see [Available in the editor today](#available-in-the-editor-today) below. The items under **Core features (requested)** remain requested and are not yet built. Sections fill in as decisions land.
+The channel was created on 2026-07-01 and this is the opening scaffold. The scope below is the initial feature list proposed by Petar and Joel and [shared by Eddie Wu](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989). This channel is still early: the build status of the individual editor surfaces listed below is being confirmed. Sections fill in as decisions land.
 
-## Available in the editor today
+## Requested by Petar (2026-07-02)
 
-Petar surfaced these on 2026-07-02: most already ship in-app, and the ask is more visibility of what already exists rather than net-new work.
+Petar shared these as feature ideas, illustrated with example screenshots taken from other apps — they are not confirmed Blaze features. Each needs to be checked against the current editor first (an equivalent may already exist) and built if it doesn't.
 
-| Surface | What it does |
+| Feature | Notes |
 | --- | --- |
-| **Text panel** | Side panel with category tabs (All / Simple / Title / Lower Third / Other) and style presets: Title, Simple, Cursive, Serif, Typewriter, Bold, Editorial, Modern (Bauhaus), Elegant, Industrial, Reliable. |
-| **Audio panel** | Browse and add audio: AI voice / Upload tabs, Voice Cloning and Voiceover, an Asset Library, and Stock Music with categories (Now Trending, Trending on TikTok, Lifestyle Vlog). |
-| **AI voice (text-to-speech)** | "Add Text-to-Speech" panel: text input, language selector, and Actors / Voice Clone tabs for choosing a voice. |
-| **Audio fade in/out** | Toggle with independent Fade In and Fade Out duration sliders. |
-| **Video speed** | Single speed slider (0–2×); intentionally simple, no speed ramps. |
+| **Text panel + style presets** | Side panel with category tabs (All / Simple / Title / Lower Third / Other) and font/style presets. Verify whether an equivalent already exists in the editor; else build. Not yet tracked. |
+| **Audio fade in/out** | Toggle with independent Fade In / Fade Out duration sliders on audio clips. Verify whether it already exists; else build. Not yet tracked. |
+| **Audio panel (library + upload)** | Browse an asset library and upload audio: AI voice / upload tabs, voice cloning / voiceover, stock music. The stock-audio modal shipped as BLZ-15693 (done); confirm coverage and extend for library-browse + upload if needed. |
+| **AI voice (text-to-speech)** | "Add Text-to-Speech": text input, language selector, and actor / voice-clone selection. Verify whether it already exists; else build. Not yet tracked. |
+| **Video speed** | Simple speed slider, no speed ramps. Already tracked as BLZ-15857 (Backlog). |
+| **GIF / animated-PNG element library** | Canva-style browsable library of animated elements. Scope pending Petar's confirmation; distinct from the existing animated-image pipeline (BLZ-15469). |
 
 ## Core features (requested)
 
@@ -36,7 +37,7 @@ The editor-basics set the team wants first:
 
 ## Nice to have
 
-- Speed up / slow down video. (Available in the editor today — see [Available in the editor today](#available-in-the-editor-today); tracking ticket BLZ-15857 may need a state update.)
+- Speed up / slow down video. (Also captured under [Requested by Petar](#requested-by-petar-2026-07-02) — tracked as BLZ-15857.)
 - Left-to-right timeline with named layers.
 - More shape options.
 - Select multiple layers from the timeline or canvas.
@@ -46,7 +47,8 @@ The editor-basics set the team wants first:
 - Priority and sequencing across the core features — not yet decided.
 - What the "generate video" entry point looks like (model, trigger, and UI).
 - How much of scene splicing is automatic (MCP on import) versus manual on the timeline.
-- Whether the requested GIF / animated-PNG element library means a Canva-style browsable library of GIFs / animated stickers, and whether that's feasible — distinct from the existing animated-image pipeline. Pending Petar's clarification.
+- Petar's screenshots were examples drawn from other apps, not Blaze features — so the whole batch under [Requested by Petar](#requested-by-petar-2026-07-02) needs an exists-vs-build check against the current editor before any work is scoped.
+- Whether the requested GIF / animated-PNG element library means a Canva-style browsable library of GIFs / animated stickers, and whether that's feasible — distinct from the existing animated-image pipeline. Scope pending Petar's clarification.
 
 ## People
 
