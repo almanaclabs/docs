@@ -1,0 +1,112 @@
+---
+title: "Google Ads (Paid Search)"
+description: "Connect a Google Ads account and use an AI-guided wizard to build, launch, and manage a real Search campaign."
+---
+
+This is the living spec for **Paid Search** — the feature that lets a small-business Blaze user connect Google Ads and launch a real Search campaign. It summarizes the product; the authoritative blueprint is the Google Ads engineering spec (**BLZ-12719**) in Linear, and the PRD lives in Blaze. When this page and those disagree, treat Linear and the PRD as the source of record and open a PR to fix whichever is wrong.
+
+## Overview
+
+Paid Search lets a Blaze user connect their **Google Ads** account over OAuth and run an AI-guided wizard that builds and launches a real Google Ads Search campaign. Once a campaign is live, you manage it from a steady-state dashboard. The feature is aimed at small-business users who want to advertise without learning the Google Ads console.
+
+The feature is largely shipped in beta — 65 of 74 tickets are done. The older UI names it "Google Ads"; the newer steady-state UI names it "Paid Search."
+
+## The creation wizard
+
+The wizard walks you through six steps, from picking a goal to launching a campaign. The current step is tracked by the `onboarding_step` enum: `goal → business → keywords → copy → details → connect → launched`.
+
+<Steps>
+  <Step title="Goal">
+    Pick one objective: **Leads**, **Calls**, **Sales**, or **Bookings**. The conversion event type is derived from the goal you choose.
+  </Step>
+  <Step title="Business context">
+    Describe the business so the AI has something to work from: service description, geography, customer type, differentiators, offer text and deadline, business hours (set per day, defaulting to Mon–Fri 9am–6pm), campaign categories (multi-select), and target languages (multi-select).
+  </Step>
+  <Step title="Keywords">
+    The AI generates target keywords and negative keywords, using Google Keyword Planner plus LLM filtering against your business info. Target keywords appear as editable chips, each with a match-type toggle (**Exact**, **Phrase**, or **Broad**). Negatives are a reviewable list. You can add your own custom keywords.
+  </Step>
+  <Step title="Copy">
+    The LLM generates Responsive Search Ad copy: six headline sets, one per angle — intent match, USP, offer/promotion, social proof, call to action, and aspiration — with 2–3 headlines each, plus one description set of four descriptions. You can edit and approve each item, regenerate a whole angle, and see a live ad preview. Headlines follow Google's rules: minimum 3, maximum 15, and a 30-character cap on each. The launch gate for this step is that every one of the six headline angle-groups has at least one approved headline.
+  </Step>
+  <Step title="Details and budget">
+    Set a daily budget, with an AI budget estimate to guide you — estimated monthly conversions, cost per conversion, and a recommended daily range from Keyword Planner. Set a start date, an optional end date, and an audience size (**Small**, **Medium**, or **Large**).
+  </Step>
+  <Step title="Connect">
+    Connect Google Ads over OAuth. You can skip this step if an integration already exists. Two verification checks run after OAuth before launch is allowed.
+  </Step>
+</Steps>
+
+## Post-OAuth verification
+
+Two checks run after you connect Google Ads:
+
+1. **Conversion tracking** — verifies that at least one conversion action has recorded a conversion in the last 30 days. This is a hard gate: if it fails, launch is blocked.
+2. **Existing campaigns** — if the account already has active campaigns, you decide whether Blaze manages them. V1 proceeds in new-campaign mode, running alongside the existing campaigns.
+
+## Launch
+
+Launch is a two-phase campaign build that runs as a background job. On success, the campaign is set active. On failure, it's set to error and reported to Sentry.
+
+### Phase 1 — Non-brand Search (always)
+
+Blaze builds a non-brand Search campaign with:
+
+- **Maximize Conversions** bidding.
+- Search Partners off and Display off.
+- Presence-only location targeting.
+- A business-hours ad schedule.
+- A −100% tablet bid adjustment.
+- Exact and Phrase match keywords, with audience observation.
+- Negative keywords.
+- A Responsive Search Ad built from the approved headlines, display paths, sitelinks, callouts, and a structured snippet.
+
+### Phase 2 — Brand Search (conditional)
+
+If brand keyword volume exists — checked via Keyword Planner — Blaze also creates a **Maximize Clicks** campaign on brand keywords, with non-brand negatives.
+
+## Steady state
+
+Once a campaign is live, you manage it from a dashboard.
+
+- **Campaigns list and detail.** The detail view shows KPIs, a 14-day CTR chart against an industry benchmark, an ad-groups table, and the campaign type and bid strategy.
+- **Health-status pills.** A campaign shows one of: **Live**, **On track**, **Testing**, **Winner**, **Spending too fast**, **Paused**, or **Over budget**.
+- **Actions.** Rename, pause/resume, edit, or delete a campaign (deleting also deletes it in Google Ads), and remove an ad.
+- **Reporting.** A weekly report and a Paid Search insights page are exposed.
+- **Timeframe filtering.** Filter by 7, 14, 30, or 90 days or lifetime, with period-over-period comparison.
+
+Metrics use the shared **MetricSnapshot** platform-insights system, with one snapshot per day. Imported and connected existing campaigns are backfilled.
+
+## Feature flags
+
+Two flags gate the feature:
+
+| Flag | Gates |
+| --- | --- |
+| `google_ads_integration` | The original wizard, OAuth, and page access. Removing this flag to fully GA the feature is still pending. |
+| `paid-search` (Flipper) | The newer steady-state Paid Search UI. |
+
+## Current state
+
+Shipped:
+
+- OAuth and integration.
+- The full six-step wizard.
+- Keyword and copy generation.
+- The two-phase launch.
+- The steady-state dashboard, with metrics, CTR, and health pills.
+- Editing basics, and pause/resume/rename/delete.
+- The weekly report and insights page.
+- Existing-campaign import with metrics backfill.
+
+In progress:
+
+- Backfilling platform insights for imported campaigns.
+
+## Roadmap
+
+Remaining and planned work:
+
+- **Performance Max (PMax)** — a PMax launch flow plus a recommendation job.
+- **Fuller campaign editing** — ad-group inspection, keyword add/remove, and bid adjustments.
+- **Full GA** — remove the `google_ads_integration` flag.
+- **Learning loop / analytics** — a milestone that's still TBD in the spec.
