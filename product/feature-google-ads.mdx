@@ -102,11 +102,42 @@ In progress:
 
 - Backfilling platform insights for imported campaigns.
 
-## Roadmap
+## Where we're headed
 
-Remaining and planned work:
+The goal is for Blaze to run Google Search advertising end to end — launching and managing campaigns, keywords, copy, budgets, and conversion tracking — with AI taking over the repetitive optimization work. The shipped wizard is the first slice; the sections below are the broader target and the automation layer we're building toward, not features that are all live today.
 
-- **Performance Max (PMax)** — a PMax launch flow plus a recommendation job.
-- **Fuller campaign editing** — ad-group inspection, keyword add/remove, and bid adjustments.
-- **Full GA** — remove the `google_ads_integration` flag.
-- **Learning loop / analytics** — a milestone that's still TBD in the spec.
+### Target management capabilities
+
+Beyond launching a campaign, Blaze is building toward the full ongoing-management surface an advertiser needs:
+
+- **Launch new campaigns** — set campaign type, objective, budget, bid strategy, and geo/schedule targeting.
+- **Manage keywords** — add keywords, set match types (broad, phrase, exact), pause low performers, and adjust keyword-level bids in manual or hybrid setups.
+- **Manage search terms and negatives** — mine the search-terms report, add negative keywords and negative lists to cut wasted spend, and promote high-intent queries to keywords.
+- **Write and manage ad copy** — create and refresh responsive search ads, pin assets where needed, and retire low-strength or low-CTR ads.
+- **Manage assets and extensions** — sitelinks, callouts, structured snippets, images, and lead forms at the right account, campaign, or ad-group level.
+- **Adjust budgets and bidding** — raise or lower daily budgets, shift spend between campaigns, and tune the bid strategy (Max Conversions, tCPA, tROAS, Max Clicks, manual CPC).
+- **Pause and prune losers** — turn off underperforming keywords, ads, ad groups, or campaigns based on CPA, ROAS, conversion volume, or quality signals.
+- **Optimize Performance Max** — manage asset groups, audience signals, listing groups, and brand exclusions, and use the limited PMax reporting to steer the black box.
+- **Set up and verify conversion tracking** — configure conversion actions, import from GA4, CRM, or offline sources, set up Enhanced Conversions, and confirm data is flowing for the bidding algorithm.
+- **Adjust targeting and audiences** — geo, device, ad schedule, and demographic adjustments, plus audience signals, remarketing lists, and customer match, with bid adjustments where the strategy allows.
+
+Today the shipped wizard already covers new-campaign creation, keyword match types, AI ad copy, negatives, budget and bid strategy, and targeting for Search. Ongoing management — search-terms mining, editing existing campaigns, and PMax/Demand Gen/Shopping — is planned.
+
+On campaign types: **Search** is what's live today, **Performance Max** is the next planned type, and **Demand Gen** and **Shopping** are further-out goals.
+
+### AI automations (roughly by time saved)
+
+The automation layer is the differentiator: Blaze aims to do the repetitive optimization work an advertiser would otherwise do by hand. This is the roadmap and vision — the items below are prioritized by time saved, and most are not yet shipped.
+
+1. **Search-terms mining and negative-keyword automation** — any account paying for clicks generates thousands of queries a month, and reviewing them is hours of painstaking work; auto-add waste to the negative-keyword list.
+2. **Automated reporting and narrative** — the biggest recurring time sink, and it scales with book size; generate the report and the story behind it.
+3. **Proactive anomaly and performance-shift detection** — watch CPA, ROAS, conversion-volume, and impression-share drift across the account and surface a triaged queue. The end state is autonomous agents handling bid adjustments, budget allocation, negative-keyword management, ad-copy testing, and anomaly detection without a human logging in.
+4. **PMax / AI Max "black-box" steering** — the levers here are configuration, not execution: asset-group quality, audience signals (directional hints, not hard restrictions), search themes, brand exclusions, and dangerous defaults. An AI that audits these, flags silent auto-enrollments, and recommends signal and exclusion changes is a genuine wedge.
+5. **Budget reallocation, including PMax-vs-Search cannibalization** — running PMax and Search (or Standard Shopping) together creates internal bid competition for the same products, and accounts without proper allocation reportedly waste 20–30% of spend on cannibalization; AI that detects the overlap and recommends the split is high-value and hard to do manually.
+6. **RSA copy generation and automated ad testing** — generation is commoditized, so the differentiation is the testing engine that continuously monitors RSA performance, finds statistically significant winners and losers, and recommends which headlines and descriptions to keep, pause, or replace.
+7. **Conversion-tracking and Enhanced Conversions verification** — automated bidding is only as good as its inputs, so verify conversion actions fire, Enhanced Conversions is configured, and offline/CRM imports are flowing.
+8. **Bulk campaign and ad-group buildout** — from a brief or by cloning a winner; a launch-heavy-week time saver.
+9. **Account-structure and wasted-spend audits** — a periodic audit for cannibalization, redundant negatives, learning-phase issues, and structural cleanup.
+10. **Onboarding and new-account audit automation** — run the full audit on access grant and produce a prioritized plan.
+
+One design question is still open: whether negative keywords should be added at the campaign or account level.
