@@ -71,7 +71,7 @@ Once a campaign is live, you manage it from a dashboard.
 - **Campaigns list and detail.** The detail view shows KPIs, a 14-day CTR chart against an industry benchmark, an ad-groups table, and the campaign type and bid strategy.
 - **Health-status pills.** A campaign shows one of: **Live**, **On track**, **Testing**, **Winner**, **Spending too fast**, **Paused**, or **Over budget**.
 - **Actions.** Rename, pause/resume, edit, or delete a campaign (deleting also deletes it in Google Ads), and remove an ad.
-- **Reporting.** A weekly report and a Paid Search insights page are exposed.
+- **Reporting.** A weekly report and a Paid Search insights page are exposed. A Monday 10am UTC job produces a Claude-written narrative from the campaign's metrics, surfaced on the insights page with a week selector.
 - **Timeframe filtering.** Filter by 7, 14, 30, or 90 days or lifetime, with period-over-period comparison.
 
 Metrics use the shared **MetricSnapshot** platform-insights system, with one snapshot per day. Imported and connected existing campaigns are backfilled.
@@ -85,59 +85,38 @@ Two flags gate the feature:
 | `google_ads_integration` | The original wizard, OAuth, and page access. Removing this flag to fully GA the feature is still pending. |
 | `paid-search` (Flipper) | The newer steady-state Paid Search UI. |
 
-## Current state
+## Status by capability
 
-Shipped:
+The goal is for Blaze to run Google Search advertising end to end, with AI taking over the repetitive optimization work. The tables below track each capability and automation by status: **Shipped** = live today, **Partial** = core is live with notable gaps, **Planned** = not yet built.
 
-- OAuth and integration.
-- The full six-step wizard.
-- Keyword and copy generation.
-- The two-phase launch.
-- The steady-state dashboard, with metrics, CTR, and health pills.
-- Editing basics, and pause/resume/rename/delete.
-- The weekly report and insights page.
-- Existing-campaign import with metrics backfill.
+### Campaign management
 
-In progress:
+| Capability | Status | Notes |
+| --- | --- | --- |
+| Launch new campaigns | **Shipped** | Wizard and backend fully wired (campaigns controller, `create_campaign.rb`, `build_campaign_job.rb`); the PaidSearch screen's **New campaign** button starts the wizard. |
+| Manage keywords | **Partial** | Adding keywords, setting match types (exact/phrase/broad), and AI generation are live (`keyword_service.rb`); pausing individual keywords and keyword-level bid adjustments are missing (bids are campaign-level only). |
+| Search terms and negatives | **Partial** | Adding and removing negative keywords is live (wizard plus `keyword_service.rb` upload/sync/remove); the search-terms report UI, mining it for waste, and promoting queries to target keywords are missing. |
+| Write and manage ad copy | **Partial** | RSA generation, headline/description editing, approve/unapprove, and delete are live; headline pinning (to specific RSA positions) and automated low-CTR retirement are missing. |
+| Assets and extensions | **Partial** | Sitelinks and callouts are live (generation plus CRUD, backend and frontend); structured snippets exist in the backend (`asset_service.rb` `upload_structured_snippets`) but have no frontend UI; images and lead forms are not built. |
+| Adjust budgets and bidding | **Partial** | Editing the daily budget is live (Details step plus `update_budget` in `campaign_building_service.rb`); bid strategy is display-only (always Maximize Conversions), with no UI to switch to tCPA, tROAS, Max Clicks, or manual CPC. |
+| Pause and prune losers | **Partial** | Campaign-level pause/resume is live (`toggle_campaign.rb` plus PaidSearchActionsMenu); pausing individual keywords, ads, or ad groups is not built. |
+| Optimize Performance Max | **Planned** | PMax DB fields exist (`pmax_google_campaign_id`, `pmax_daily_budget`, `pmax_status`, `campaign_type` enum) plus cleanup logic, but there is no asset-group management, audience signals, listing groups, or brand exclusions — no interactions or UI. |
+| Set up and verify conversion tracking | **Shipped** | Conversion-action selection, the 30-day verification check, and campaign-level conversion-goal setup are live (`Tracking.tsx` plus `conversion_tracking_checker.rb`); Enhanced Conversions setup is the remaining gap. |
+| Adjust targeting and audiences | **Partial** | Geographic targeting, language selection, and the business-hours ad schedule are live (applied at launch via `campaign_building_service.rb`); device targeting is a static −100% tablet adjustment with no UI; demographics, audience signals, remarketing lists, and customer match are not built. |
 
-- Backfilling platform insights for imported campaigns.
+### AI automations
 
-## Where we're headed
-
-The goal is for Blaze to run Google Search advertising end to end — launching and managing campaigns, keywords, copy, budgets, and conversion tracking — with AI taking over the repetitive optimization work. The shipped wizard is the first slice; the sections below are the broader target and the automation layer we're building toward, not features that are all live today.
-
-### Target management capabilities
-
-Beyond launching a campaign, Blaze is building toward the full ongoing-management surface an advertiser needs:
-
-- **Launch new campaigns** — set campaign type, objective, budget, bid strategy, and geo/schedule targeting.
-- **Manage keywords** — add keywords, set match types (broad, phrase, exact), pause low performers, and adjust keyword-level bids in manual or hybrid setups.
-- **Manage search terms and negatives** — mine the search-terms report, add negative keywords and negative lists to cut wasted spend, and promote high-intent queries to keywords.
-- **Write and manage ad copy** — create and refresh responsive search ads, pin assets where needed, and retire low-strength or low-CTR ads.
-- **Manage assets and extensions** — sitelinks, callouts, structured snippets, images, and lead forms at the right account, campaign, or ad-group level.
-- **Adjust budgets and bidding** — raise or lower daily budgets, shift spend between campaigns, and tune the bid strategy (Max Conversions, tCPA, tROAS, Max Clicks, manual CPC).
-- **Pause and prune losers** — turn off underperforming keywords, ads, ad groups, or campaigns based on CPA, ROAS, conversion volume, or quality signals.
-- **Optimize Performance Max** — manage asset groups, audience signals, listing groups, and brand exclusions, and use the limited PMax reporting to steer the black box.
-- **Set up and verify conversion tracking** — configure conversion actions, import from GA4, CRM, or offline sources, set up Enhanced Conversions, and confirm data is flowing for the bidding algorithm.
-- **Adjust targeting and audiences** — geo, device, ad schedule, and demographic adjustments, plus audience signals, remarketing lists, and customer match, with bid adjustments where the strategy allows.
-
-Today the shipped wizard already covers new-campaign creation, keyword match types, AI ad copy, negatives, budget and bid strategy, and targeting for Search. Ongoing management — search-terms mining, editing existing campaigns, and PMax/Demand Gen/Shopping — is planned.
-
-On campaign types: **Search** is what's live today, **Performance Max** is the next planned type, and **Demand Gen** and **Shopping** are further-out goals.
-
-### AI automations (roughly by time saved)
-
-The automation layer is the differentiator: Blaze aims to do the repetitive optimization work an advertiser would otherwise do by hand. This is the roadmap and vision — the items below are prioritized by time saved, and most are not yet shipped.
-
-1. **Search-terms mining and negative-keyword automation** — any account paying for clicks generates thousands of queries a month, and reviewing them is hours of painstaking work; auto-add waste to the negative-keyword list.
-2. **Automated reporting and narrative** — the biggest recurring time sink, and it scales with book size; generate the report and the story behind it.
-3. **Proactive anomaly and performance-shift detection** — watch CPA, ROAS, conversion-volume, and impression-share drift across the account and surface a triaged queue. The end state is autonomous agents handling bid adjustments, budget allocation, negative-keyword management, ad-copy testing, and anomaly detection without a human logging in.
-4. **PMax / AI Max "black-box" steering** — the levers here are configuration, not execution: asset-group quality, audience signals (directional hints, not hard restrictions), search themes, brand exclusions, and dangerous defaults. An AI that audits these, flags silent auto-enrollments, and recommends signal and exclusion changes is a genuine wedge.
-5. **Budget reallocation, including PMax-vs-Search cannibalization** — running PMax and Search (or Standard Shopping) together creates internal bid competition for the same products, and accounts without proper allocation reportedly waste 20–30% of spend on cannibalization; AI that detects the overlap and recommends the split is high-value and hard to do manually.
-6. **RSA copy generation and automated ad testing** — generation is commoditized, so the differentiation is the testing engine that continuously monitors RSA performance, finds statistically significant winners and losers, and recommends which headlines and descriptions to keep, pause, or replace.
-7. **Conversion-tracking and Enhanced Conversions verification** — automated bidding is only as good as its inputs, so verify conversion actions fire, Enhanced Conversions is configured, and offline/CRM imports are flowing.
-8. **Bulk campaign and ad-group buildout** — from a brief or by cloning a winner; a launch-heavy-week time saver.
-9. **Account-structure and wasted-spend audits** — a periodic audit for cannibalization, redundant negatives, learning-phase issues, and structural cleanup.
-10. **Onboarding and new-account audit automation** — run the full audit on access grant and produce a prioritized plan.
+| Automation | Status | Notes |
+| --- | --- | --- |
+| Search-terms mining and negative-keyword automation | **Planned** | `generate_negative_keywords_job.rb` is wizard-time only (negatives from the business brief); no scheduled job pulls the live search-terms report or auto-adds waste. |
+| Automated reporting and narrative | **Shipped** | A Monday 10am UTC Sidekiq cron triggers a Temporal workflow that calls Claude to generate a markdown narrative from Lakehouse gold metrics (`weekly_report/enqueue_generate_jobs.rb` → `generator.rb`); full UI in `WeeklyReportInsights.tsx` with a week selector. |
+| Proactive anomaly and performance-shift detection | **Partial** | Campaign health pills (`campaignHealthStatus.ts`: budget drift, spend pace, learning phase, ROAS, CTR) and the CampaignNoticesBanner are live; there is no active alerting, cross-account CPA/ROAS/impression-share drift monitoring, or proactive notification queue (the autonomous-agent end state is not built). |
+| PMax / AI Max steering | **Planned** | Not built. |
+| Budget reallocation / cannibalization detection | **Planned** | Not built. |
+| RSA copy generation and automated ad testing | **Partial** | Copy generation is live (`generate_headlines.rb`, `generate_descriptions.rb`); the testing engine (continuous performance monitoring, statistical winner/loser detection, retirement recommendations) is not built. |
+| Conversion-tracking verification | **Partial** | The one-time wizard gate check is live (`conversion_tracking_checker.rb`, GoogleAdsConversionTrackingModal); there is no ongoing scheduled verification that conversion actions keep firing. |
+| Bulk campaign and ad-group buildout | **Partial** | Bulk import of existing campaigns is live (`import_existing_campaigns.rb`, with Keyword Planner enrichment); cloning a winner and brief-driven buildout are not built. |
+| Account-structure and wasted-spend audits | **Planned** | Not built. |
+| Onboarding and new-account audit automation | **Partial** | `run_account_checks.rb` fires on OAuth grant and runs conversion-tracking verification plus an existing-campaigns scan (a pre-flight gate, not a full prioritized audit plan). |
 
 One design question is still open: whether negative keywords should be added at the campaign or account level.
