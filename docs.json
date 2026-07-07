@@ -32,7 +32,8 @@
           "product/feature-channel-workflow",
           "product/feature-business-scorecard",
           "product/feature-mcp",
-          "product/feature-video"
+          "product/feature-video",
+          "product/feature-google-ads"
         ]
       }
     ]

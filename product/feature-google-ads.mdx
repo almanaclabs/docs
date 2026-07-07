@@ -1,0 +1,122 @@
+---
+title: "Google Ads (Paid Search)"
+description: "Connect a Google Ads account and use an AI-guided wizard to build, launch, and manage a real Search campaign."
+---
+
+This is the living spec for **Paid Search** — the feature that lets a small-business Blaze user connect Google Ads and launch a real Search campaign. It summarizes the product; the authoritative blueprint is the Google Ads engineering spec (**BLZ-12719**) in Linear, and the PRD lives in Blaze. When this page and those disagree, treat Linear and the PRD as the source of record and open a PR to fix whichever is wrong.
+
+## Overview
+
+Paid Search lets a Blaze user connect their **Google Ads** account over OAuth and run an AI-guided wizard that builds and launches a real Google Ads Search campaign. Once a campaign is live, you manage it from a steady-state dashboard. The feature is aimed at small-business users who want to advertise without learning the Google Ads console.
+
+The feature is largely shipped in beta — 65 of 74 tickets are done. The older UI names it "Google Ads"; the newer steady-state UI names it "Paid Search."
+
+## The creation wizard
+
+The wizard walks you through six steps, from picking a goal to launching a campaign. The current step is tracked by the `onboarding_step` enum: `goal → business → keywords → copy → details → connect → launched`.
+
+<Steps>
+  <Step title="Goal">
+    Pick one objective: **Leads**, **Calls**, **Sales**, or **Bookings**. The conversion event type is derived from the goal you choose.
+  </Step>
+  <Step title="Business context">
+    Describe the business so the AI has something to work from: service description, geography, customer type, differentiators, offer text and deadline, business hours (set per day, defaulting to Mon–Fri 9am–6pm), campaign categories (multi-select), and target languages (multi-select).
+  </Step>
+  <Step title="Keywords">
+    The AI generates target keywords and negative keywords, using Google Keyword Planner plus LLM filtering against your business info. Target keywords appear as editable chips, each with a match-type toggle (**Exact**, **Phrase**, or **Broad**). Negatives are a reviewable list. You can add your own custom keywords.
+  </Step>
+  <Step title="Copy">
+    The LLM generates Responsive Search Ad copy: six headline sets, one per angle — intent match, USP, offer/promotion, social proof, call to action, and aspiration — with 2–3 headlines each, plus one description set of four descriptions. You can edit and approve each item, regenerate a whole angle, and see a live ad preview. Headlines follow Google's rules: minimum 3, maximum 15, and a 30-character cap on each. The launch gate for this step is that every one of the six headline angle-groups has at least one approved headline.
+  </Step>
+  <Step title="Details and budget">
+    Set a daily budget, with an AI budget estimate to guide you — estimated monthly conversions, cost per conversion, and a recommended daily range from Keyword Planner. Set a start date, an optional end date, and an audience size (**Small**, **Medium**, or **Large**).
+  </Step>
+  <Step title="Connect">
+    Connect Google Ads over OAuth. You can skip this step if an integration already exists. Two verification checks run after OAuth before launch is allowed.
+  </Step>
+</Steps>
+
+## Post-OAuth verification
+
+Two checks run after you connect Google Ads:
+
+1. **Conversion tracking** — verifies that at least one conversion action has recorded a conversion in the last 30 days. This is a hard gate: if it fails, launch is blocked.
+2. **Existing campaigns** — if the account already has active campaigns, you decide whether Blaze manages them. V1 proceeds in new-campaign mode, running alongside the existing campaigns.
+
+## Launch
+
+Launch is a two-phase campaign build that runs as a background job. On success, the campaign is set active. On failure, it's set to error and reported to Sentry.
+
+### Phase 1 — Non-brand Search (always)
+
+Blaze builds a non-brand Search campaign with:
+
+- **Maximize Conversions** bidding.
+- Search Partners off and Display off.
+- Presence-only location targeting.
+- A business-hours ad schedule.
+- A −100% tablet bid adjustment.
+- Exact and Phrase match keywords, with audience observation.
+- Negative keywords.
+- A Responsive Search Ad built from the approved headlines, display paths, sitelinks, callouts, and a structured snippet.
+
+### Phase 2 — Brand Search (conditional)
+
+If brand keyword volume exists — checked via Keyword Planner — Blaze also creates a **Maximize Clicks** campaign on brand keywords, with non-brand negatives.
+
+## Steady state
+
+Once a campaign is live, you manage it from a dashboard.
+
+- **Campaigns list and detail.** The detail view shows KPIs, a 14-day CTR chart against an industry benchmark, an ad-groups table, and the campaign type and bid strategy.
+- **Health-status pills.** A campaign shows one of: **Live**, **On track**, **Testing**, **Winner**, **Spending too fast**, **Paused**, or **Over budget**.
+- **Actions.** Rename, pause/resume, edit, or delete a campaign (deleting also deletes it in Google Ads), and remove an ad.
+- **Reporting.** A weekly report and a Paid Search insights page are exposed. A Monday 10am UTC job produces a Claude-written narrative from the campaign's metrics, surfaced on the insights page with a week selector.
+- **Timeframe filtering.** Filter by 7, 14, 30, or 90 days or lifetime, with period-over-period comparison.
+
+Metrics use the shared **MetricSnapshot** platform-insights system, with one snapshot per day. Imported and connected existing campaigns are backfilled.
+
+## Feature flags
+
+Two flags gate the feature:
+
+| Flag | Gates |
+| --- | --- |
+| `google_ads_integration` | The original wizard, OAuth, and page access. Removing this flag to fully GA the feature is still pending. |
+| `paid-search` (Flipper) | The newer steady-state Paid Search UI. |
+
+## Status by capability
+
+The goal is for Blaze to run Google Search advertising end to end, with AI taking over the repetitive optimization work. The tables below track each capability and automation by status: **Shipped** = live today, **Partial** = core is live with notable gaps, **Planned** = not yet built.
+
+### Campaign management
+
+| Capability | Status | Notes |
+| --- | --- | --- |
+| Launch new campaigns | **Shipped** | Wizard and backend fully wired (campaigns controller, `create_campaign.rb`, `build_campaign_job.rb`); the PaidSearch screen's **New campaign** button starts the wizard. |
+| Manage keywords | **Partial** | Adding keywords, setting match types (exact/phrase/broad), and AI generation are live (`keyword_service.rb`); pausing individual keywords and keyword-level bid adjustments are missing (bids are campaign-level only). |
+| Search terms and negatives | **Partial** | Adding and removing negative keywords is live (wizard plus `keyword_service.rb` upload/sync/remove); the search-terms report UI, mining it for waste, and promoting queries to target keywords are missing. |
+| Write and manage ad copy | **Partial** | RSA generation, headline/description editing, approve/unapprove, and delete are live; headline pinning (to specific RSA positions) and automated low-CTR retirement are missing. |
+| Assets and extensions | **Partial** | Sitelinks and callouts are live (generation plus CRUD, backend and frontend); structured snippets exist in the backend (`asset_service.rb` `upload_structured_snippets`) but have no frontend UI; images and lead forms are not built. |
+| Adjust budgets and bidding | **Partial** | Editing the daily budget is live (Details step plus `update_budget` in `campaign_building_service.rb`); bid strategy is display-only (always Maximize Conversions), with no UI to switch to tCPA, tROAS, Max Clicks, or manual CPC. |
+| Pause and prune losers | **Partial** | Campaign-level pause/resume is live (`toggle_campaign.rb` plus PaidSearchActionsMenu); pausing individual keywords, ads, or ad groups is not built. |
+| Optimize Performance Max | **Planned** | PMax DB fields exist (`pmax_google_campaign_id`, `pmax_daily_budget`, `pmax_status`, `campaign_type` enum) plus cleanup logic, but there is no asset-group management, audience signals, listing groups, or brand exclusions — no interactions or UI. |
+| Set up and verify conversion tracking | **Shipped** | Conversion-action selection, the 30-day verification check, and campaign-level conversion-goal setup are live (`Tracking.tsx` plus `conversion_tracking_checker.rb`); Enhanced Conversions setup is the remaining gap. |
+| Adjust targeting and audiences | **Partial** | Geographic targeting, language selection, and the business-hours ad schedule are live (applied at launch via `campaign_building_service.rb`); device targeting is a static −100% tablet adjustment with no UI; demographics, audience signals, remarketing lists, and customer match are not built. |
+
+### AI automations
+
+| Automation | Status | Notes |
+| --- | --- | --- |
+| Search-terms mining and negative-keyword automation | **Planned** | `generate_negative_keywords_job.rb` is wizard-time only (negatives from the business brief); no scheduled job pulls the live search-terms report or auto-adds waste. |
+| Automated reporting and narrative | **Shipped** | A Monday 10am UTC Sidekiq cron triggers a Temporal workflow that calls Claude to generate a markdown narrative from Lakehouse gold metrics (`weekly_report/enqueue_generate_jobs.rb` → `generator.rb`); full UI in `WeeklyReportInsights.tsx` with a week selector. |
+| Proactive anomaly and performance-shift detection | **Partial** | Campaign health pills (`campaignHealthStatus.ts`: budget drift, spend pace, learning phase, ROAS, CTR) and the CampaignNoticesBanner are live; there is no active alerting, cross-account CPA/ROAS/impression-share drift monitoring, or proactive notification queue (the autonomous-agent end state is not built). |
+| PMax / AI Max steering | **Planned** | Not built. |
+| Budget reallocation / cannibalization detection | **Planned** | Not built. |
+| RSA copy generation and automated ad testing | **Partial** | Copy generation is live (`generate_headlines.rb`, `generate_descriptions.rb`); the testing engine (continuous performance monitoring, statistical winner/loser detection, retirement recommendations) is not built. |
+| Conversion-tracking verification | **Partial** | The one-time wizard gate check is live (`conversion_tracking_checker.rb`, GoogleAdsConversionTrackingModal); there is no ongoing scheduled verification that conversion actions keep firing. |
+| Bulk campaign and ad-group buildout | **Partial** | Bulk import of existing campaigns is live (`import_existing_campaigns.rb`, with Keyword Planner enrichment); cloning a winner and brief-driven buildout are not built. |
+| Account-structure and wasted-spend audits | **Planned** | Not built. |
+| Onboarding and new-account audit automation | **Partial** | `run_account_checks.rb` fires on OAuth grant and runs conversion-tracking verification plus an existing-campaigns scan (a pre-flight gate, not a full prioritized audit plan). |
+
+One design question is still open: whether negative keywords should be added at the campaign or account level.
