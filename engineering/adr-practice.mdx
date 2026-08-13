@@ -4,7 +4,7 @@ description: "When we write ADRs, the template we use, where they live, and how 
 icon: "file-lines"
 ---
 
-ADRs are short, immutable records of significant technical decisions. For a 4-engineer team they are the highest-leverage documentation we write, because they serve two audiences at once: future humans (why is it built this way?) and our coding agents (durable context that survives stateless sessions).
+ADRs are short, immutable records of significant technical decisions. For a small team they are the highest-leverage documentation we write, because they serve two audiences at once: future humans (why is it built this way?) and our coding agents (durable context that survives stateless sessions).
 
 ## When to write one
 
@@ -37,15 +37,15 @@ date: 2026-08-13
 
 ## Context
 What forces are at play? Constraints, requirements, the state of the
-system when the decision was made. 3–6 sentences.
+system when the decision was made. 3 to 6 sentences.
 
 ## Decision
 **We will run all multi-step content-generation pipelines as Temporal
-workflows rather than chained Sidekiq jobs.** (Bolded, 1–2 sentences.
+workflows rather than chained Sidekiq jobs.** (Bolded, 1 to 2 sentences.
 If you can't state it in two sentences, the decision is too vague.)
 
 ## Options considered
-Real alternatives, honestly weighed — including "do nothing."
+Real alternatives, honestly weighed, including "do nothing."
 
 ## Consequences
 What gets easier, what gets harder, and what would trigger
@@ -56,7 +56,7 @@ re-evaluating this decision.
 
 1. **Never edit an accepted ADR.** Write a new one that supersedes it; set `superseded_by` on the old and cross-link both.
 2. **The ADR lands in the same PR as the code it documents.** An ADR written weeks later is fiction.
-3. **Agents draft, humans decide.** Let the coding agent draft the ADR from the grill/spec session — they're good at it — but a human owns the decision and edits for honesty, especially the consequences section.
+3. **Agents draft, humans decide.** Let the coding agent draft the ADR from the grill/spec session (they're good at it) but a human owns the decision and edits for honesty, especially the consequences section.
 
 ## ADRs as agent context
 
@@ -65,11 +65,11 @@ Every repo's `AGENTS.md`/`CLAUDE.md` points at `docs/adr/` and instructs agents 
 Practical habits:
 
 - When kicking off non-trivial agent work, reference the relevant ADRs by number in the prompt.
-- When an agent proposes something that contradicts an active ADR, that's a signal: either correct the agent or supersede the ADR — never silently diverge.
+- When an agent proposes something that contradicts an active ADR, that's a signal: either correct the agent or supersede the ADR. Never silently diverge.
 
 ## Open decisions
 
 <Note>
-  - Whether to later invest in **enforced** ADRs — deterministic CI checks for a few red-lane invariants (e.g., "no direct DB access outside repositories") — once the advisory tier is habitual.
+  - Whether to later invest in **enforced** ADRs, i.e. deterministic CI checks for a few red-lane invariants (e.g., "no direct DB access outside repositories"), once the advisory tier is habitual.
   - Whether ADRs for the main Blaze app get backfilled beyond new decisions (proposal: backfill only when a decision actively confuses someone).
 </Note>

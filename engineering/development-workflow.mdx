@@ -4,35 +4,35 @@ description: "Our default loop for non-trivial work: grill the plan, commit the 
 icon: "route"
 ---
 
-This is the default lifecycle for any non-trivial change at Blaze. It slots inside the existing PRD → design → ESD → Linear → dogfooding → QA → release lifecycle; it defines what happens between ESD and release.
+This is the default lifecycle for any non-trivial change at Blaze. Work that originates as a PM/designer prototype enters through the [prototype-to-production pipeline](/engineering/prototype-to-production) first; everything lands here for the build.
 
-The underlying reframe: AI made building, plan interrogation, and PR decomposition cheap. Human review judgment and product validation stayed expensive. So we no longer pre-decide PR boundaries to make review possible — we build end-to-end first, validate the product with a demo, and _then_ cut small PRs along the boundaries the code revealed.
+The underlying reframe: AI made building, plan interrogation, and PR decomposition cheap. Human review judgment and product validation stayed expensive. So we no longer pre-decide PR boundaries to make review possible. We build end-to-end first, validate the product with a demo, and _then_ cut small PRs along the boundaries the code revealed.
 
 ## The loop
 
 <Steps>
   <Step title="Grill the plan">
-    Before writing code, run an adversarial plan interrogation with your agent (use the shared `grill-me` skill). The agent interviews you relentlessly about the plan — edge cases, dependencies, failure modes — one question at a time, with a recommended answer for each. The output is a plan with **real decisions** in it, not vibes.
+    Before writing code, run an adversarial plan interrogation with your agent. Ask it to interview you relentlessly about the plan: edge cases, dependencies, failure modes, one question at a time, with a recommended answer for each. Walk down each branch of the design until the open questions are resolved. The output is a plan with **real decisions** in it, not vibes.
 
-    Run this even for smaller changes; a 10-minute grill is cheaper than a wrong build. Sessions on genuinely novel work commonly run 30–45 minutes and are worth it.
+    Run this even for smaller changes; a 10-minute grill is cheaper than a wrong build. Sessions on genuinely novel work commonly run 30 to 45 minutes and are worth it.
 
     <Warning>
-      Only grill when the output feeds a durable artifact (a spec, an ESD update, a Linear description). The agent is stateless — an ungrounded grill session evaporates.
+      Only grill when the output feeds a durable artifact (a spec, a Linear description, a design doc). The agent is stateless; an ungrounded grill session evaporates.
     </Warning>
   </Step>
   <Step title="Commit the spec (when the design is novel)">
-    If the work is architecturally new — new data model, new service boundary, new external dependency, anything that will need an ADR — the first artifact is a spec committed to the repo **before implementation**, as a document PR the team can push back on. For routine work, skip straight to build.
+    If the work is architecturally new (new data model, new service boundary, new external dependency, anything that will need an ADR) the first artifact is a spec committed to the repo **before implementation**, as a document PR the team can push back on. For routine work, skip straight to build.
   </Step>
   <Step title="Build wide">
-    One throwaway branch, end-to-end, across whatever files it takes. Commits are **save points**, not a story for reviewers — this history is scratch paper and gets discarded at the split. Don't polish commit messages; do commit often enough that you can roll the agent back.
+    One throwaway branch, end-to-end, across whatever files it takes. Commits are **save points**, not a story for reviewers. This history is scratch paper and gets discarded at the split. Don't polish commit messages; do commit often enough that you can roll the agent back.
   </Step>
   <Step title="Demo before anyone reads the code">
-    Post a short Loom/Slack video or a Heroku Review App link and show the working feature to the PM, designer, or a teammate — **before** code review. This catches "built the wrong thing" while it costs minutes instead of days. Feed any feedback back through a quick re-grill so iteration stays grounded in decisions, not vibes.
+    Post a short Loom/Slack video or a Heroku Review App link and show the working feature to the PM, designer, or a teammate **before** code review. This catches "built the wrong thing" while it costs minutes instead of days. Feed any feedback back through a quick re-grill so iteration stays grounded in decisions, not vibes.
 
-    With 4 engineers, this is our single highest-leverage habit: it protects our scarcest resource, human review time.
+    On a small team, this is our single highest-leverage habit: it protects our scarcest resource, human review time.
   </Step>
   <Step title="Ship narrow">
-    Once the demo validates the product, cut small, independently reviewable PRs off `main` along the boundaries the finished code revealed. Have the agent propose the split — splitting is a prompt now.
+    Once the demo validates the product, cut small, independently reviewable PRs off `main` along the boundaries the finished code revealed. Have the agent propose the split; splitting is a prompt now.
 
     Two hard rules:
 
@@ -40,7 +40,7 @@ The underlying reframe: AI made building, plan interrogation, and PR decompositi
     - **The split is when you read your own AI-written code.** This is how the author comes to own the change before asking a teammate to review it.
   </Step>
   <Step title="Clean up last">
-    Deletion of the replaced code path ships in its **own final PR**, after the new path is live. Never mix deletion with creation — it confuses review and makes rollback ambiguous.
+    Deletion of the replaced code path ships in its **own final PR**, after the new path is live. Never mix deletion with creation; it confuses review and makes rollback ambiguous.
   </Step>
 </Steps>
 
@@ -49,13 +49,13 @@ The underlying reframe: AI made building, plan interrogation, and PR decompositi
 Plan these up front instead of discovering boundaries late:
 
 - **Database migrations and schema changes** that must be sequenced in production (expand/contract, backfills). With Postgres \+ pgvector, Sidekiq, and Temporal in the mix, sequencing is a first-class design concern.
-- **Temporal workflow versioning changes** — running workflows constrain what can ship when.
-- **Work with one obvious cut point** — if the natural PR structure is already clear, don't ceremonialize it.
+- **Temporal workflow versioning changes.** Running workflows constrain what can ship when.
+- **Work with one obvious cut point.** If the natural PR structure is already clear, don't ceremonialize it.
 
 ## Open decisions
 
 <Note>
   - The exact threshold that makes a committed spec mandatory (proposal: anything that would require an ADR, plus any new user-facing surface in the AM/Client app).
   - Whether demo sign-off is required from the PM specifically or any second person.
-  - A working agreement on how long split PRs may sit unmerged — splitting is not shipping.
+  - A working agreement on how long split PRs may sit unmerged. Splitting is not shipping.
 </Note>

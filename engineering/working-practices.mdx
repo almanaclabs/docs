@@ -1,14 +1,14 @@
 ---
 title: "Working Practices"
-description: "Review lanes, the testing bar for AI-generated code, agent instruction files, and ownership — the practices that make an AI-heavy workflow safe with 4 engineers."
+description: "Review lanes, the testing bar for AI-generated code, and agent instruction files: the practices that make an AI-heavy workflow safe with a small team."
 icon: "users"
 ---
 
-With 4 engineers, we cannot afford ceremony that doesn't pay for itself. These practices exist to protect the two things that stayed expensive in the AI era: human review judgment and production safety.
+As a small team, we cannot afford ceremony that doesn't pay for itself. These practices exist to protect the two things that stayed expensive in the AI era: human review judgment and production safety.
 
 ## Agent instruction files
 
-Every repo maintains a lean `AGENTS.md` (shared) with `CLAUDE.md` importing it via `@AGENTS.md`. This is the repo's constitution for agents. Keep it tight — bloated instruction files get ignored wholesale.
+Every repo maintains a lean `AGENTS.md` (shared) with `CLAUDE.md` importing it via `@AGENTS.md`. This is the repo's constitution for agents. Keep it tight; bloated instruction files get ignored wholesale.
 
 Required contents:
 
@@ -32,21 +32,20 @@ Automate the mechanical half of review (lint, types, tests, secret and dependenc
 
 An AI code-review bot runs as first pass on every PR. It resolves the mechanical questions in minutes so the human reviewer spends judgment on the two questions that matter: _does this change belong here_, and _will this API shape hurt in six months_.
 
-Keep PRs small — the [ship-narrow split](/engineering/development-workflow#the-loop) exists so both the bot and the human can actually read them.
+Keep PRs small. The [ship-narrow split](/engineering/development-workflow#the-loop) exists so both the bot and the human can actually read them.
 
 ## The testing bar for AI-generated code
 
-AI code fails differently from human code: hallucinated APIs, happy-path-only handling, silent logic drift — and it _looks_ right, which is exactly why it passes shallow review. Treat AI output as untrusted input.
+AI code fails differently from human code: hallucinated APIs, happy-path-only handling, silent logic drift. And it _looks_ right, which is exactly why it passes shallow review. Treat AI output as untrusted input.
 
-- **Don't let the AI mark its own homework.** Critical business logic requires at least one human-written assertion — tests derived entirely from the same agent that wrote the code share its blind spots.
+- **Don't let the AI mark its own homework.** Critical business logic requires at least one human-written assertion. Tests derived entirely from the same agent that wrote the code share its blind spots.
 - **Favor integration and property tests for business invariants** (billing, permissions, workspace isolation) over unit-test volume.
 - **Author reads every line before requesting review.** The ship-narrow split is where this happens; "the agent wrote it" is never an excuse in a post-mortem.
 - Tag AI-heavy PRs so reviewers switch into skeptical mode.
 
-## Ownership
+## Ways of working
 
-- **Named owner per area** (module/service/surface). The owner has decision authority for their area — no approval chains.
-- **Anyone can work anywhere**, because decisions live in specs and ADRs rather than in heads. Ownership means accountability for the area's health, not a lock.
+- **Anyone can work anywhere**, because decisions live in specs and ADRs rather than in heads.
 - **Async-first.** Demos in Slack, specs and ADRs in-repo, decisions written down. Meetings are for genuine disagreement, not status.
 
 ## Open decisions
@@ -55,5 +54,4 @@ AI code fails differently from human code: hallucinated APIs, happy-path-only ha
   - Exact Green/Yellow/Red lane definitions for the Blaze codebase (the table above is the starting proposal).
   - A concrete coverage floor for business logic in the new AM/Client app.
   - Which AI review bot to standardize on, and whether it gets repo-specific context beyond `AGENTS.md`.
-  - The area-ownership map for 4 engineers — who owns what.
 </Note>

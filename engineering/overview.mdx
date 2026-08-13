@@ -4,7 +4,7 @@ description: "How Blaze engineering builds with AI: our development loop, protot
 icon: "compass"
 ---
 
-This section defines how Blaze engineering operates as a 4-engineer team building heavily with AI. It covers four interlocking practices:
+This section defines how Blaze engineering operates as a small team building heavily with AI. It covers four interlocking practices:
 
 <CardGroup cols={2}>
   <Card title="Development Workflow" icon="route" href="/engineering/development-workflow">
@@ -20,7 +20,7 @@ This section defines how Blaze engineering operates as a 4-engineer team buildin
   </Card>
 
   <Card title="Working Practices" icon="users" href="/engineering/working-practices">
-    Review lanes, the testing bar for AI code, agent instruction files, and ownership with 4 engineers.
+    Review lanes, the testing bar for AI code, agent instruction files, and how we work as a small team.
   </Card>
 </CardGroup>
 
@@ -30,16 +30,22 @@ AI changed the economics of our development loop. Three things got dramatically 
 
 The operating principles:
 
-1. **Design still goes first.** Cheap building does not mean skipping thinking — it means the thinking happens in an interrogated plan and (when novel) a committed spec, not in review comments after the fact.
+1. **Design still goes first.** Cheap building does not mean skipping thinking. It means the thinking happens in an interrogated plan and (when novel) a committed spec, not in review comments after the fact.
 2. **Validate the product before reviewing the code.** A demo catches "built the wrong thing" while it is cheap to fix. Code review should never be the first time someone sees a feature.
 3. **PR boundaries are discovered, not pre-planned.** We build end-to-end first, then split along the seams the code revealed. Splitting is a prompt now.
 4. **Prototype code is disposable; prototype intent is not.** PM and designer prototypes are living specs. The validated flows transfer; the code gets rebuilt in our stack.
-5. **Decisions get written down.** ADRs and specs are how a 4-person team stays legible to itself — and how our coding agents inherit context instead of re-deciding architecture per session.
+5. **Decisions get written down.** ADRs and specs are how a small team stays legible to itself, and how our coding agents inherit context instead of re-deciding architecture per session.
 6. **AI output is untrusted input.** We hold AI-generated code to a higher verification bar, not a lower one. The data is unambiguous: AI-generated code carries measurably more defects and security flaws than human-written code.
 
-## How this fits our existing lifecycle
+## This is the new lifecycle
 
-The existing feature lifecycle (PRD → design → ESD → Linear → dogfooding → QA → release) still stands. These practices change what happens _inside_ the build phase — between ESD and release — and add an explicit intake path for prototypes that originate outside engineering.
+The old feature lifecycle (PRD → design → ESD → Linear → dogfooding → QA → release) no longer reflects how we work. Work doesn't start from PRDs anymore; it starts from design prototypes. And there is no QA team; verification is built into the workflow itself through the demo gate, the testing bar, and dogfooding.
+
+These practices are the replacement, end to end:
+
+- **Intake** happens through the [prototype-to-production pipeline](/engineering/prototype-to-production) when work originates as a PM/designer prototype, or directly through the [development workflow](/engineering/development-workflow) when it originates in engineering.
+- **Verification** is the demo gate, the [testing bar for AI-generated code](/engineering/working-practices#the-testing-bar-for-ai-generated-code), and dogfooding before release.
+- **Decisions** are captured in [ADRs](/engineering/adr-practice) and specs as we go, in the same PRs as the code.
 
 <Note>
   These docs contain flagged **open decisions** where the team needs to settle specifics. Raise them in #engineering or at the next eng sync; once settled, update the doc in the same PR as any related change.

@@ -4,19 +4,19 @@ description: "How PM and designer prototypes become production code: keep the va
 icon: "flask"
 ---
 
-PMs and designers are encouraged to vibe-code prototypes (v0, Lovable, Figma Make, Claude Artifacts) to validate concepts — especially for the new AM/Client app. This doc defines how those prototypes become production software.
+PMs and designers are encouraged to vibe-code prototypes (v0, Lovable, Figma Make, Claude Artifacts) to validate concepts, especially for the new AM/Client app. Design prototypes are how work enters engineering now, so this pipeline is the front door of our lifecycle. This doc defines how those prototypes become production software.
 
-**Our stance: a prototype is a disposable living spec.** We keep the intent — the problem framing, validated flows, and UX decisions — and we throw the code away. Production code is rebuilt inside the Blaze stack (Rails, pgvector, AnyCable, Sidekiq, Temporal) behind an explicit engineering gate.
+**Our stance: a prototype is a disposable living spec.** We keep the intent (the problem framing, validated flows, and UX decisions) and we throw the code away. Production code is rebuilt inside the Blaze stack (Rails, pgvector, AnyCable, Sidekiq, Temporal) behind an explicit engineering gate.
 
-Why the hard line: prototype tools emit React/Next/Supabase-style code that doesn't match our stack, and the security data on shipping AI-generated prototype code is damning — large-scale studies have found LLMs introduce an OWASP Top 10 vulnerability in roughly 45% of code generation tasks, and platform audits repeatedly find broken auth, hardcoded secrets, and missing data-access policies in vibe-coded apps. The prototype's value is the validated intent, not the code.
+Why the hard line: prototype tools emit React/Next/Supabase-style code that doesn't match our stack, and the security data on shipping AI-generated prototype code is damning. Large-scale studies have found LLMs introduce an OWASP Top 10 vulnerability in roughly 45% of code generation tasks, and platform audits repeatedly find broken auth, hardcoded secrets, and missing data-access policies in vibe-coded apps. The prototype's value is the validated intent, not the code.
 
 ## The pipeline
 
 <Steps>
-  <Step title="Stage 0 — Prototype (PM/designer owns)">
-    Build freely in any tool. Goal: validate the concept with real interactions and real stakeholders. No production expectations, no engineering involvement required. Prototypes live in a scratch space — never in the production repos.
+  <Step title="Stage 0 - Prototype (PM/designer owns)">
+    Build freely in any tool. Goal: validate the concept with real interactions and real stakeholders. No production expectations, no engineering involvement required. Prototypes live in a scratch space, never in the production repos.
   </Step>
-  <Step title="Gate A — Intent capture">
+  <Step title="Gate A - Intent capture">
     Before engineering picks it up, the prototype must ship with a short intent brief:
 
     - The **problem / user need** it validates
@@ -26,14 +26,14 @@ Why the hard line: prototype tools emit React/Next/Supabase-style code that does
 
     The prototype is the living spec; this gate just makes the _why_ explicit so it survives the rebuild.
   </Step>
-  <Step title="Gate B — Engineering triage and rebuild decision">
-    An engineer audits the prototype and makes an explicit, documented call per area: **keep** (rare — isolated, stateless UI only), **adapt**, or **rebuild** (the default for anything touching auth, data, money, PII, or the backend). This is the intentional pause: engineering owns what goes live. Material architecture choices made here get an [ADR](/engineering/adr-practice).
+  <Step title="Gate B - Engineering triage and rebuild decision">
+    An engineer audits the prototype and makes an explicit, documented call per area: **keep** (rare: isolated, stateless UI only), **adapt**, or **rebuild** (the default for anything touching auth, data, money, PII, or the backend). This is the intentional pause: engineering owns what goes live. Material architecture choices made here get an [ADR](/engineering/adr-practice).
   </Step>
-  <Step title="Stage 1 — Productionize in-stack">
-    Rebuild against the Blaze stack. Reconstruct the invariants the prototype left implicit: identity, workspace ownership, permissions, failure behavior, idempotency. Add real tests per the [testing bar](/engineering/working-practices#the-testing-bar-for-ai-generated-code).
+  <Step title="Stage 1 - Productionize in-stack">
+    Rebuild against the Blaze stack via the [development workflow](/engineering/development-workflow). Reconstruct the invariants the prototype left implicit: identity, workspace ownership, permissions, failure behavior, idempotency. Add real tests per the [testing bar](/engineering/working-practices#the-testing-bar-for-ai-generated-code).
   </Step>
-  <Step title="Gate C — Standard release path">
-    Rejoin the normal lifecycle: Linear → dogfooding → QA → release. Nothing about prototype origin exempts work from it.
+  <Step title="Gate C - Release">
+    Track in Linear, demo for validation, and dogfood before release. There is no QA team; the demo gate, the testing bar, and dogfooding are the verification.
   </Step>
 </Steps>
 
