@@ -35,6 +35,17 @@
           "product/feature-video",
           "product/feature-google-ads"
         ]
+      },
+      {
+        "group": "Engineering",
+        "icon": "code",
+        "pages": [
+          "engineering/overview",
+          "engineering/development-workflow",
+          "engineering/prototype-to-production",
+          "engineering/adr-practice",
+          "engineering/working-practices"
+        ]
       }
     ]
   },

@@ -1,0 +1,62 @@
+---
+title: "Prototype to Production"
+description: "How PM and designer prototypes become production code: keep the validated intent, rebuild the code in our stack, gate everything through engineering."
+icon: "flask"
+---
+
+PMs and designers are encouraged to vibe-code prototypes (v0, Lovable, Figma Make, Claude Artifacts) to validate concepts — especially for the new AM/Client app. This doc defines how those prototypes become production software.
+
+**Our stance: a prototype is a disposable living spec.** We keep the intent — the problem framing, validated flows, and UX decisions — and we throw the code away. Production code is rebuilt inside the Blaze stack (Rails, pgvector, AnyCable, Sidekiq, Temporal) behind an explicit engineering gate.
+
+Why the hard line: prototype tools emit React/Next/Supabase-style code that doesn't match our stack, and the security data on shipping AI-generated prototype code is damning — large-scale studies have found LLMs introduce an OWASP Top 10 vulnerability in roughly 45% of code generation tasks, and platform audits repeatedly find broken auth, hardcoded secrets, and missing data-access policies in vibe-coded apps. The prototype's value is the validated intent, not the code.
+
+## The pipeline
+
+<Steps>
+  <Step title="Stage 0 — Prototype (PM/designer owns)">
+    Build freely in any tool. Goal: validate the concept with real interactions and real stakeholders. No production expectations, no engineering involvement required. Prototypes live in a scratch space — never in the production repos.
+  </Step>
+  <Step title="Gate A — Intent capture">
+    Before engineering picks it up, the prototype must ship with a short intent brief:
+
+    - The **problem / user need** it validates
+    - The **validated flows** (the clickable prototype itself serves as this)
+    - What is **load-bearing vs. flexible** in the UX
+    - **Acceptance criteria written as user intent**, not visual parity ("AM can approve a draft in under 3 clicks," not "matches the prototype pixel-for-pixel")
+
+    The prototype is the living spec; this gate just makes the _why_ explicit so it survives the rebuild.
+  </Step>
+  <Step title="Gate B — Engineering triage and rebuild decision">
+    An engineer audits the prototype and makes an explicit, documented call per area: **keep** (rare — isolated, stateless UI only), **adapt**, or **rebuild** (the default for anything touching auth, data, money, PII, or the backend). This is the intentional pause: engineering owns what goes live. Material architecture choices made here get an [ADR](/engineering/adr-practice).
+  </Step>
+  <Step title="Stage 1 — Productionize in-stack">
+    Rebuild against the Blaze stack. Reconstruct the invariants the prototype left implicit: identity, workspace ownership, permissions, failure behavior, idempotency. Add real tests per the [testing bar](/engineering/working-practices#the-testing-bar-for-ai-generated-code).
+  </Step>
+  <Step title="Gate C — Standard release path">
+    Rejoin the normal lifecycle: Linear → dogfooding → QA → release. Nothing about prototype origin exempts work from it.
+  </Step>
+</Steps>
+
+## What transfers vs. what gets rebuilt
+
+| Transfers (keep) | Gets rebuilt (throw away) |
+| --- | --- |
+| Problem framing and validated user need | The prototype's actual code |
+| User flows, navigation, interaction model | Auth, data access, permissions logic |
+| Load-bearing UX decisions | Backend, jobs, real-time, persistence |
+| Intent-based acceptance criteria | Dependency choices and configuration |
+| Visual and design-system direction | Anything security- or money-sensitive |
+
+## Hard rules
+
+- **No prototype code merges to a Blaze production repo without passing Gate B.** No exceptions for urgency.
+- Prototypes never connect to production data or credentials.
+- If a prototype demo goes to a client, it is labeled as a prototype.
+
+## Open decisions
+
+<Note>
+  - Whether to allow a narrow "keep the code" exception for throwaway internal tools with no auth/PII (proposal: yes, with a named engineer sponsor).
+  - Where the prototype scratch space lives (separate GitHub org/repo vs. tool-native sharing).
+  - Who fills out the Gate A intent brief when a prototype comes from a client conversation rather than a PM.
+</Note>

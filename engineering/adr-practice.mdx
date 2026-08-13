@@ -1,0 +1,75 @@
+---
+title: "Architecture Decision Records"
+description: "When we write ADRs, the template we use, where they live, and how they feed our coding agents as durable architectural context."
+icon: "file-lines"
+---
+
+ADRs are short, immutable records of significant technical decisions. For a 4-engineer team they are the highest-leverage documentation we write, because they serve two audiences at once: future humans (why is it built this way?) and our coding agents (durable context that survives stateless sessions).
+
+## When to write one
+
+Write an ADR for:
+
+- A **new dependency** (gem, npm package, external service)
+- A **storage or data strategy** decision (new table pattern, pgvector usage, caching layer)
+- A **platform target** (new runtime, hosting change, new client surface)
+- A **core abstraction** (a base class, service-object pattern, API convention others will build on)
+- A **cross-cutting pattern** (auth model, tenancy, real-time strategy, background-job conventions)
+
+Do **not** write ADRs for bug fixes, styling, or behavior-preserving refactors.
+
+Rule of thumb: if a future engineer (or agent) could plausibly ask "why is it done this way?" and the answer isn't obvious from the code, it deserves an ADR.
+
+## Format and conventions
+
+- **Location:** `docs/adr/` in each repo. The new AM/Client app gets its own from day one, seeded with ADRs for the greenfield stack decisions. A `README.md` index lists all ADRs with status.
+- **Filename:** `NNNN-short-decision-title.md`, numbered from `0001`.
+- **Frontmatter:** `id`, `title`, `status` (`proposed | active | superseded | retired`), `date`, `superseded_by`.
+- **One ADR = one decision.**
+
+```md 0007-use-temporal-for-generation-pipelines.md
+---
+id: 0007
+title: Use Temporal for generation pipelines
+status: active
+date: 2026-08-13
+---
+
+## Context
+What forces are at play? Constraints, requirements, the state of the
+system when the decision was made. 3–6 sentences.
+
+## Decision
+**We will run all multi-step content-generation pipelines as Temporal
+workflows rather than chained Sidekiq jobs.** (Bolded, 1–2 sentences.
+If you can't state it in two sentences, the decision is too vague.)
+
+## Options considered
+Real alternatives, honestly weighed — including "do nothing."
+
+## Consequences
+What gets easier, what gets harder, and what would trigger
+re-evaluating this decision.
+```
+
+## Lifecycle rules
+
+1. **Never edit an accepted ADR.** Write a new one that supersedes it; set `superseded_by` on the old and cross-link both.
+2. **The ADR lands in the same PR as the code it documents.** An ADR written weeks later is fiction.
+3. **Agents draft, humans decide.** Let the coding agent draft the ADR from the grill/spec session — they're good at it — but a human owns the decision and edits for honesty, especially the consequences section.
+
+## ADRs as agent context
+
+Every repo's `AGENTS.md`/`CLAUDE.md` points at `docs/adr/` and instructs agents to check relevant ADRs before making structural choices. This is the "advisory" tier: ADRs in context raise the odds the agent follows our architecture instead of re-deciding it per session, without guaranteeing compliance.
+
+Practical habits:
+
+- When kicking off non-trivial agent work, reference the relevant ADRs by number in the prompt.
+- When an agent proposes something that contradicts an active ADR, that's a signal: either correct the agent or supersede the ADR — never silently diverge.
+
+## Open decisions
+
+<Note>
+  - Whether to later invest in **enforced** ADRs — deterministic CI checks for a few red-lane invariants (e.g., "no direct DB access outside repositories") — once the advisory tier is habitual.
+  - Whether ADRs for the main Blaze app get backfilled beyond new decisions (proposal: backfill only when a decision actively confuses someone).
+</Note>
