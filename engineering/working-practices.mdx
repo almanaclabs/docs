@@ -1,0 +1,57 @@
+---
+title: "Working Practices"
+description: "Review lanes, the testing bar for AI-generated code, and agent instruction files: the practices that make an AI-heavy workflow safe with a small team."
+icon: "users"
+---
+
+As a small team, we cannot afford ceremony that doesn't pay for itself. These practices exist to protect the two things that stayed expensive in the AI era: human review judgment and production safety.
+
+## Agent instruction files
+
+Every repo maintains a lean `AGENTS.md` (shared) with `CLAUDE.md` importing it via `@AGENTS.md`. This is the repo's constitution for agents. Keep it tight; bloated instruction files get ignored wholesale.
+
+Required contents:
+
+- Exact build, test, and lint commands
+- The stack and the conventions that differ from framework defaults
+- The testing bar (below)
+- Boundaries: files and directories agents must not touch
+- A pointer to `docs/adr/` with the instruction to check relevant ADRs before structural choices
+
+Treat it as living config: when an agent repeatedly makes the same mistake, the fix usually belongs in `AGENTS.md`, not in the next prompt.
+
+## Review lanes
+
+Automate the mechanical half of review (lint, types, tests, secret and dependency scanning, CI) and route human attention by risk:
+
+| Lane | Scope | Review requirement |
+| --- | --- | --- |
+| 🟢 Green | Docs, styling, copy, isolated UI | AI review bot \+ author self-review; merge on green CI |
+| 🟡 Yellow | Business logic, integrations, background jobs | One human reviewer |
+| 🔴 Red | Auth, payments, PII, migrations, Temporal workflows, infra | Careful human review, no rubber stamps; usually an ADR |
+
+An AI code-review bot runs as first pass on every PR. It resolves the mechanical questions in minutes so the human reviewer spends judgment on the two questions that matter: _does this change belong here_, and _will this API shape hurt in six months_.
+
+Keep PRs small. The [ship-narrow split](/engineering/development-workflow#the-loop) exists so both the bot and the human can actually read them.
+
+## The testing bar for AI-generated code
+
+AI code fails differently from human code: hallucinated APIs, happy-path-only handling, silent logic drift. And it _looks_ right, which is exactly why it passes shallow review. Treat AI output as untrusted input.
+
+- **Don't let the AI mark its own homework.** Critical business logic requires at least one human-written assertion. Tests derived entirely from the same agent that wrote the code share its blind spots.
+- **Favor integration and property tests for business invariants** (billing, permissions, workspace isolation) over unit-test volume.
+- **Author reads every line before requesting review.** The ship-narrow split is where this happens; "the agent wrote it" is never an excuse in a post-mortem.
+- Tag AI-heavy PRs so reviewers switch into skeptical mode.
+
+## Ways of working
+
+- **Anyone can work anywhere**, because decisions live in specs and ADRs rather than in heads.
+- **Async-first.** Demos in Slack, specs and ADRs in-repo, decisions written down. Meetings are for genuine disagreement, not status.
+
+## Open decisions
+
+<Note>
+  - Exact Green/Yellow/Red lane definitions for the Blaze codebase (the table above is the starting proposal).
+  - A concrete coverage floor for business logic in the new AM/Client app.
+  - Which AI review bot to standardize on, and whether it gets repo-specific context beyond `AGENTS.md`.
+</Note>
