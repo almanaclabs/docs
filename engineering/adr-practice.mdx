@@ -22,14 +22,14 @@ Rule of thumb: if a future engineer (or agent) could plausibly ask "why is it do
 
 ## Format and conventions
 
-- **Location:** `docs/adr/` in each repo. The new AM/Client app gets its own from day one, seeded with ADRs for the greenfield stack decisions. A `README.md` index lists all ADRs with status.
-- **Filename:** `NNNN-short-decision-title.md`, numbered from `0001`.
-- **Frontmatter:** `id`, `title`, `status` (`proposed | active | superseded | retired`), `date`, `superseded_by`.
+- **Location:** `docs/adr/` in each repo. The new AM/Client app gets its own from day one, seeded with ADRs for the greenfield stack decisions. A `README.md` index lists all ADRs with status. Records that predate the timestamp convention were numbered `NNNN`; where they have been renamed, the index maps the old numbers to their identifiers.
+- **Filename:** `<timestamp>-short-decision-title.md`, where the timestamp is the UTC moment the record was created, formatted `YYYYMMDDHHMMSS`. Allocate it with `date -u +%Y%m%d%H%M%S`, taking the next free second if that prefix is already taken. This is the scheme Rails uses for migration versions: records sort chronologically, and two branches can add one without racing for the same number.
+- **Frontmatter:** `id` (the same timestamp as the filename), `title`, `status` (`proposed | active | superseded | retired`), `date`, `superseded_by`.
 - **One ADR = one decision.**
 
-```md 0007-use-temporal-for-generation-pipelines.md
+```md 20260813142207-use-temporal-for-generation-pipelines.md
 ---
-id: 0007
+id: 20260813142207
 title: Use Temporal for generation pipelines
 status: active
 date: 2026-08-13
@@ -64,7 +64,7 @@ Every repo's `AGENTS.md`/`CLAUDE.md` points at `docs/adr/` and instructs agents 
 
 Practical habits:
 
-- When kicking off non-trivial agent work, reference the relevant ADRs by number in the prompt.
+- When kicking off non-trivial agent work, reference the relevant ADRs by title and path in the prompt. A fourteen-digit identifier tells a reader nothing; the title is what carries the decision, which is why we cite records that way everywhere except `superseded_by` and the index.
 - When an agent proposes something that contradicts an active ADR, that's a signal: either correct the agent or supersede the ADR. Never silently diverge.
 
 ## Open decisions
