@@ -29,6 +29,14 @@ The editor-basics set the team wants first:
 - More shape options.
 - Select multiple layers from the timeline or canvas.
 
+## Behavior decisions
+
+Settled behaviors as they're decided:
+
+| Area | Decision |
+| --- | --- |
+| **Clip length cap** | A clip's length is capped at the duration of its underlying video asset. On edit, clip length clamps to the asset duration so it can't be extended past the source — no freeze-frame padding of the final frame. |
+
 ## Open questions
 
 - Priority and sequencing across the core features — not yet decided.
@@ -45,3 +53,4 @@ The editor-basics set the team wants first:
 ## Sources
 
 - [Video editor feature list](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1782926268434989) — Eddie Wu in #feat-video, 2026-07-01.
+- [Clip length cap](https://almanac-hq.slack.com/archives/C0BFCFCPUN4/p1783618835197269) — Tristan Marchand in #feat-video, 2026-07-09.
